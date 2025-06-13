@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+
+#scroll::-webkit-scrollbar {
+    display: none;
+  }
+  #mScroll::-webkit-scrollbar {
+    display: none;
+  }
+  #hScroll::-webkit-scrollbar {
+    display: none;
+  }
+  #dScroll::-webkit-scrollbar {
+    display: none;
+  }
+ #myLeaveScroll::-webkit-scrollbar {
+  display: none;
+ }
+ #myTeamLeaveScroll::-webkit-scrollbar {
+  display: none;
+ }
+ 
+ #rScroll::-webkit-scrollbar {
+  display: none;
+ }
+ #home:active {
+  background-color: black;
+}
+#request:active {
+  background-color: black;
+}
+#team:active{
+  background-color: black;
+}
+#list:active {
+  background-color: black;
+}

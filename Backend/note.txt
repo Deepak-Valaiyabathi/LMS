@@ -1,0 +1,60 @@
+// import { pool} from './ds.js';
+// // import JWT from 'jsonwebtoken';
+// const secret = 'yourSecretKey';
+
+
+//userLogin
+  // server.route({
+  //   method: 'POST',
+  //   path: '/api/employee',
+  //   handler: async (request, h) => {
+  //     console.log(request.payload)
+  //     const { EmployeeId, Password } = request.payload;
+  
+  //     try {
+  //       const [rows] = await pool.query('SELECT * FROM Employee WHERE Employee_id = ?', [EmployeeId]);
+  //       // if (rows.length === 0) {
+  //       //   return h.response({ message: 'User not found' }).code(401);
+  //       // }
+  //       const user = rows;
+  //       console.log(user);
+  
+  //       if (user.password === Password && user.employee_id === EmployeeId) {
+  //         const token = JWT.sign({ employee_id: user.employee_id, employee_role: user.employee_role, employee_name: user.employee_name }, secret, { expiresIn: '1h' });
+  //         return h.response({ token }).code(200);
+  //       } else {
+  //         return h.response({ message: 'Invalid password' }).code(401);
+  //       }
+  
+  //     } catch (err) {
+  //       console.error(err);
+  //       return h.response({ message: 'Server error' }).code(500);
+  //     }
+  //   }
+  // });
+
+  // //Current user Data 
+  // server.route({
+  //   method: 'POST',
+  //   path: '/api/currentEmployee',
+  //   handler: async (request, h) => {
+  //     console.log(request.payload)
+  //     const { EmployeeId } = request.payload;
+  //    console.log(EmployeeId)
+  //     try {
+  //       const [rows] = await pool.query('SELECT * FROM Employee WHERE Employee_id = ?', [EmployeeId]);
+  //       const user = rows;
+  //       console.log(user)
+  //       return h.response({ user }).code(200);
+  //     } catch (err) {
+  //       console.error(err);
+  //       return h.response({ message: 'Server error' }).code(500);
+  //     }
+  //   }
+  // });
+
+
+  {
+      "EmployeeId":"LMT20101", "leaveId":"1", "startDate":"2025-05-12", "endDate":"2025-05-13", "reason":"I have a fever and sore throat and need to rest to prevent it from getting worse"
+                
+}
