@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
-import balance from "../assets/LeaveBalance.jpg";
 import Calendar from "../components/Calender";
-import LeaveForm from "../pages/Leave";
-import file from "../assets/Leave Policy Document.pdf";
+import LeaveForm from "../components/Leave";
 import LeaveStatusTimeline from "../components/LeaveStatusTimeline";
+import balance from "../assets/LeaveBalance.jpg";
+import file from "../assets/Leave Policy Document.pdf";
 
 type leave_Balance = {
   total_leave: number;
   name: string;
-  id:number;
+  id: number;
 };
 type LeaveRequestStatus = {
   name: string;
@@ -21,6 +21,7 @@ type LeaveRequestStatus = {
 };
 type TeamLeaveRequestStatus = {
   name: string;
+  id: number;
   start_date: string;
   end_date: string;
   count: number;
@@ -33,9 +34,11 @@ const LeaveRequest = () => {
   const [leaveRequestStatus, setLeaveRequestStatus] = useState<
     LeaveRequestStatus[]
   >([]);
+
   const [teamLeaveStatus, setTeamLeaveStatus] = useState<
     TeamLeaveRequestStatus[]
   >([]);
+
   const [openRequestId, setOpenRequestId] = useState<number | null>(null);
 
   const toggleTimeline = (id: number) => {
@@ -60,37 +63,38 @@ const LeaveRequest = () => {
       teamLeaveRequestStatus(token, manager_id, employee_id);
     }
   }, []);
+
   //Leave balance status
   const leaveDataFetch = async (token: string, employee_id: string) => {
     try {
-      const response = await fetch("http://localhost:5000/api/leave-balance", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ employee_id }),
-        credentials: "include",
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/leave-balance/${employee_id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const result = await response.json();
       setLeaveBalance(result.leaveBalance);
     } catch (err) {
       console.error(err);
     }
   };
+
   // leave request status
   const leaveStatusFetch = async (token: string, employee_id: string) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/leave-request-status",
+        `http://localhost:5000/api/leave-request-status/${employee_id}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ employee_id }),
-          credentials: "include",
         }
       );
       const result = await response.json();
@@ -113,15 +117,13 @@ const LeaveRequest = () => {
   ) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/team-members/leave-status",
+        `http://localhost:5000/api/team-leave-request-status/${manager_id}/${employee_id}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ manager_id, employee_id }),
-          credentials: "include",
         }
       );
       const result = await response.json();
@@ -139,6 +141,7 @@ const LeaveRequest = () => {
 
   const leaveCancel = async (Leave_Request_Id: number) => {
     const token = localStorage.getItem("token")!;
+    const employee_id = localStorage.getItem("employee_id")!;
     try {
       const response = await fetch(
         "http://localhost:5000/api/leave-request/employee-update",
@@ -148,7 +151,7 @@ const LeaveRequest = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ Leave_Request_Id }),
+          body: JSON.stringify({ Leave_Request_Id, employee_id }),
           credentials: "include",
         }
       );
@@ -163,7 +166,6 @@ const LeaveRequest = () => {
     }
   };
 
-  
   //date format converter
   const formatDate = (isoDate: string): string => {
     const date = new Date(isoDate);
@@ -218,8 +220,7 @@ const LeaveRequest = () => {
                   </a>
                 </div>
                 <div className="flex h-[55vh] w-fit">
-                 
-                  <LeaveForm leaveBalance={leaveBalance}/>
+                  <LeaveForm leaveBalance={leaveBalance} />
                   <div>
                     <h1 className="text-center text-[25px]">Holidays</h1>
                     <Calendar />
@@ -243,36 +244,39 @@ const LeaveRequest = () => {
                   </span>{" "}
                   My Team Leaves
                 </h1>
-               <div className="overflow-y-scroll h-[60vh]" id="myTeamLeaveScroll">
-               {teamLeaveStatus.length === 0 ? (
-                  <h1 className="text-center text-gray-500 text-[18px] my-4">
-                    No leaves
-                  </h1>
-                ) : (
-                  teamLeaveStatus.flat().map((request, index) => (
-                    <div
-                      key={index}
-                      className="my-3 h-[12vh] flex flex-col justify-center gap-1"
-                    >
-                      <div className="flex justify-between px-4">
-                        <h1 className="text-[19px]">{request.name}</h1>
-                        <h1 className="w-[110px] text-[19px] text-center rounded-lg px-2 bg-[#6a77f9] text-white">
-                          On Leave
-                        </h1>
+                <div
+                  className="overflow-y-scroll h-[60vh]"
+                  id="myTeamLeaveScroll"
+                >
+                  {teamLeaveStatus.length === 0 ? (
+                    <h1 className="text-center text-gray-500 text-[18px] my-4">
+                      No leaves
+                    </h1>
+                  ) : (
+                    teamLeaveStatus.flat().sort((a, b) => b.id - a.id) .map((request, index) => (
+                      <div
+                        key={index}
+                        className="my-3 h-[12vh] flex flex-col justify-center gap-1"
+                      >
+                        <div className="flex justify-between px-4">
+                          <h1 className="text-[19px]">{request.name}</h1>
+                          <h1 className="w-[110px] text-[19px] text-center rounded-lg px-2 bg-[#6a77f9] text-white">
+                            On Leave
+                          </h1>
+                        </div>
+                        <div className="flex justify-between pl-4 pr-6">
+                          <h1 className="text-[17px]">
+                            {formatDate(request.start_date)}
+                          </h1>
+                          <h1 className="text-[17px]">{`${request.count} Days`}</h1>
+                          <h1 className="text-[17px]">
+                            {formatDate(request.end_date)}
+                          </h1>
+                        </div>
                       </div>
-                      <div className="flex justify-between pl-4 pr-6">
-                        <h1 className="text-[17px]">
-                          {formatDate(request.start_date)}
-                        </h1>
-                        <h1 className="text-[17px]">{`${request.count} Days`}</h1>
-                        <h1 className="text-[17px]">
-                          {formatDate(request.end_date)}
-                        </h1>
-                      </div>
-                    </div>
-                  ))
-                )}
-               </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
           </main>
@@ -292,75 +296,80 @@ const LeaveRequest = () => {
                   You have not applied for any leave
                 </h1>
               ) : (
-                leaveRequestStatus.flat().map((request, index) => {
-                  const statusColor =
-                    request.status == 7
-                      ? "red"
-                      : request.status == 6
-                      ? "#72b043"
-                      : "blue";
+                leaveRequestStatus
+                  .flat()
+                  .sort((a, b) => b.id - a.id)
+                  .map((request, index) => {
+                    const statusColor =
+                      request.status == 7
+                        ? "red"
+                        : request.status == 6
+                        ? "#72b043"
+                        : "blue";
 
-                  return (
-                    <div
-                      key={index}
-                      className="my-3 h-fit flex flex-col bg-gray-100 justify-center gap-1 relative group px-4 py-2 rounded-lg shadow"
-                    >
-                      <div className="flex justify-between items-center">
-                        <h1 className="text-[19px]">{request.name}</h1>
-                        <h1
-                          style={{
-                            border: `2px solid ${statusColor}`,
-                            color: statusColor,
-                          }}
-                          className={`w-[110px] text-[17px] text-center rounded-lg px-2 ${
-                            request.status === 1 ? "group-hover:hidden" : ""
-                          }`}
-                        >
-                          {request.status === 6
-                            ? "Approved"
-                            : request.status === 7
-                            ? "Rejected"
-                            : "Pending"}
-                        </h1>
-
-                        {request.status == 1 && (
-                          <button
-                            className="text-red-500 text-[20px] cursor-pointer hidden group-hover:block"
-                            onClick={() => leaveCancel(request.id)}
+                    return (
+                      <div
+                        key={index}
+                        className="my-3 h-fit flex flex-col bg-gray-100 justify-center gap-1 relative group px-4 py-2 rounded-lg shadow"
+                      >
+                        <div className="flex justify-between items-center">
+                          <h1 className="text-[19px]">{request.name}</h1>
+                          <h1
+                            style={{
+                              border: `2px solid ${statusColor}`,
+                              color: statusColor,
+                            }}
+                            className={`w-[110px] text-[17px] text-center rounded-lg px-2 ${
+                              request.status === 1 || request.status === 0
+                                ? "group-hover:hidden"
+                                : ""
+                            }`}
                           >
-                            <i className="fa-solid fa-trash-can"></i>
-                          </button>
+                            {request.status === 6
+                              ? "Approved"
+                              : request.status === 7
+                              ? "Rejected"
+                              : "Pending"}
+                          </h1>
+
+                          {(request.status === 1 || request.status === 0) && (
+                            <button
+                              className="text-red-500 text-[20px] cursor-pointer hidden group-hover:block"
+                              onClick={() => leaveCancel(request.id)}
+                            >
+                              <i className="fa-solid fa-trash-can"></i>
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Dates and count */}
+                        <div className="flex justify-between text-[17px] px-1">
+                          <h1>{formatDate(request.start_date)}</h1>
+                          <h1>{`${request.count} Days`}</h1>
+                          <h1>{formatDate(request.end_date)}</h1>
+                        </div>
+
+                        {request.name !== "Sick" && (
+                          <p
+                            className="text-right text-[#6a77f9] text-[17px] hover:underline underline-offset-1 cursor-pointer"
+                            onClick={() => toggleTimeline(request.id)}
+                          >
+                            <i
+                              className={`fa-solid ${
+                                openRequestId === request.id
+                                  ? "fa-chevron-up"
+                                  : "fa-chevron-down"
+                              }`}
+                            ></i>{" "}
+                          </p>
+                        )}
+
+                        {openRequestId === request.id && (
+                          <LeaveStatusTimeline request_id={request.id} />
                         )}
                       </div>
-
-                      {/* Dates and count */}
-                      <div className="flex justify-between text-[17px] px-1">
-                        <h1>{formatDate(request.start_date)}</h1>
-                        <h1>{`${request.count} Days`}</h1>
-                        <h1>{formatDate(request.end_date)}</h1>
-                      </div>
-
-                      {request.name !== "Sick" && (
-                        <p
-                          className="text-right text-[#6a77f9] text-[17px] hover:underline underline-offset-1 cursor-pointer"
-                          onClick={() => toggleTimeline(request.id)}
-                        >
-                          <i
-                            className={`fa-solid ${
-                              openRequestId === request.id
-                                ? "fa-chevron-up"
-                                : "fa-chevron-down"
-                            }`}
-                          ></i>{" "}
-                        </p>
-                      )}
-
-                      {openRequestId === request.id && (
-                        <LeaveStatusTimeline request_id={request.id} />
-                      )}
-                    </div>
-                  );
-                })
+                    );
+                  })
               )}
             </div>
           </aside>

@@ -164,15 +164,13 @@ function LeaveList() {
   const requestListManager = async (token: string, employee_id: string) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/leave-request/manager",
+        `http://localhost:5000/api/leave-request/manager/${employee_id}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ employee_id }),
-          credentials: "include",
         }
       );
       const result = await response.json();
@@ -231,15 +229,13 @@ function LeaveList() {
   const requestListHR = async (token: string, employee_id: string) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/leave-request/HR",
+        `http://localhost:5000/api/leave-request/HR/${employee_id}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ employee_id }),
-          credentials: "include",
         }
       );
       const result = await response.json();
@@ -302,15 +298,14 @@ function LeaveList() {
   const requestListDirector = async (token: string, employee_id: string) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/leave-request/Director",
+        `http://localhost:5000/api/leave-request/Director/${employee_id}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ employee_id }),
-          credentials: "include",
+       
         }
       );
       const result = await response.json();
@@ -497,7 +492,7 @@ function LeaveList() {
                 </tr>
               </thead>
               <tbody>
-                {leaveRequestListManager.flat().map((request, index) => (
+                {leaveRequestListManager.flat().sort((a, b) => b.LeaveRequestId - a.LeaveRequestId).map((request, index) => (
                   <tr key={index} className="hover:bg-gray-100 transition">
                     <td className="text-[16px] font-normal px-3 py-2 h-[7vh]">
                       {request.Employee_Id}
@@ -591,7 +586,7 @@ function LeaveList() {
                 </tr>
               </thead>
               <tbody>
-                {leaveRequestListHR.flat().map((request, index) => (
+                {leaveRequestListHR.flat().sort((a, b) => b.LeaveRequestId - a.LeaveRequestId).map((request, index) => (
                   <tr key={index} className="hover:bg-gray-100 transition">
                     <td className="text-[16px] font-normal px-3 py-2 h-[7vh]">
                       {request.Employee_Id}
@@ -687,7 +682,7 @@ function LeaveList() {
                 </tr>
               </thead>
               <tbody>
-                {leaveRequestListDirector.flat().map((request, index) => (
+                {leaveRequestListDirector.flat().sort((a, b) => b.LeaveRequestId - a.LeaveRequestId).map((request, index) => (
                   <tr key={index} className="hover:bg-gray-100 transition">
                     <td className="text-[16px] font-normal px-3 py-2 h-[7vh]">
                       {request.Employee_Id}

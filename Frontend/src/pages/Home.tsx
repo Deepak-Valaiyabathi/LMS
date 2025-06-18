@@ -50,14 +50,12 @@ function Home() {
 
   const jobDataFetch = async (token: string, employee_id: string) => {
     try {
-      const response = await fetch("http://localhost:5000/api/jobDetails", {
-        method: "POST",
+      const response = await fetch(`http://localhost:5000/api/jobDetails/${employee_id}`, {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ employee_id }),
-        credentials: "include",
       });
 
       const result = await response.json();
@@ -70,15 +68,13 @@ function Home() {
   const personalDataFetch = async (token: string, employee_id: string) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/personalDetails",
+        `http://localhost:5000/api/personalDetails/${employee_id}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ employee_id }),
-          credentials: "include",
         }
       );
       const result = await response.json();

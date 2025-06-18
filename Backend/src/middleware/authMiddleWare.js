@@ -1,9 +1,11 @@
 
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const authMiddleware = (request, h) => {
   const token = request.headers.authorization?.split(' ')[1];
-  const SECRET = "npc";
+  const SECRET = process.env.JWT_SECRET;
 
   try {
     const decoded = jwt.verify(token, SECRET);

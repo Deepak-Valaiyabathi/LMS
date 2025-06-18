@@ -161,8 +161,7 @@ export const leaveRequestModel = async (payload) => {
 
 //user see the leave request
 
-export const leaveRequestStatusModel = async (payload) => {
-  const { employee_id } = payload;
+export const leaveRequestStatusModel = async (employee_id) => {
 
   const query = `
   SELECT 
@@ -189,9 +188,8 @@ export const leaveRequestStatusModel = async (payload) => {
 
 // user see the leave request status approved timeline
 
-export const leaveRequestStatusTimelineModel = async (payload) => {
+export const leaveRequestStatusTimelineModel = async (request_id) => {
   try {
-    const { request_id } = payload;
 
     const [data] = await pool.query(
       `
@@ -229,8 +227,8 @@ export const leaveRequestStatusTimelineModel = async (payload) => {
 };
 
 //  team member leave status
-export const teamMembersLeaveStatusModel = async (payload) => {
-  const { manager_id, employee_id } = payload;
+export const teamMembersLeaveStatusModel = async (params) => {
+  const { manager_id, employee_id } = params;
 
   try {
     const employeeRows = await employeesIdFind(manager_id, employee_id);
@@ -269,8 +267,8 @@ export const teamMembersLeaveStatusModel = async (payload) => {
 
 // team member calender
 
-export const teamMemberCalenderModel = async (payload) => {
-  const { manager_id } = payload;
+export const teamMemberCalenderModel = async (manager_id) => {
+
   try {
     const query = `
     SELECT 
@@ -287,14 +285,10 @@ export const teamMemberCalenderModel = async (payload) => {
       Employee E ON E.id = LR.employee_id
     WHERE 
       LR.status = 6 AND (
-        E.manager_id = ? OR 
-        E.director_id = ? OR 
-        E.hr_id = ?
+        E.manager_id = ? 
       )
   `;
     const [result] = await pool.query(query, [
-      manager_id,
-      manager_id,
       manager_id,
     ]);
     return result;
@@ -306,8 +300,8 @@ export const teamMemberCalenderModel = async (payload) => {
 
 // manager see the leave request
 
-export const leaveRequestManagerModel = async (payload) => {
-  const { employee_id } = payload;
+export const leaveRequestManagerModel = async (employee_id) => {
+ 
 
   console.log(employee_id, ": employee id");
   try {
@@ -348,8 +342,7 @@ WHERE
 
 // hr see the leave request
 
-export const leaveRequestHRModel = async (payload) => {
-  const { employee_id } = payload;
+export const leaveRequestHRModel = async (employee_id) => {
 
   try {
     const employeeRows = await teamEmployeesIdFind(employee_id);
@@ -388,8 +381,7 @@ WHERE
 };
 
 // director see the leave request.
-export const leaveRequestDirectorModel = async (payload) => {
-  const { employee_id } = payload;
+export const leaveRequestDirectorModel = async (employee_id) => {
 
   try {
     const employeeRows = await teamEmployeesIdFind(employee_id);
@@ -427,10 +419,11 @@ WHERE
     return err;
   }
 };
+
 // Manger and HR and Director see the leaves history
 
-export const leaveHistoryModel = async (payload) => {
-  const { employee_id } = payload;
+export const leaveHistoryModel = async (employee_id) => {
+
   try {
     const employeeRows = await teamEmployeesIdFind(employee_id);
     if (!employeeRows || employeeRows.length === 0) {
@@ -464,10 +457,9 @@ export const leaveHistoryModel = async (payload) => {
     return err;
   }
 };
-//eployee own leave history
-export const leaveDateHistoryModel = async (payload) => {
+  // all user leave request dates
+export const leaveDateHistoryModel = async (employee_id) => {
   try {
-    const { employee_id } = payload;
 
     const query = `
       SELECT start_date, end_date
@@ -485,17 +477,19 @@ export const leaveDateHistoryModel = async (payload) => {
   }
 };
 
-//=======> PUT 🆙 <=========
+
 // employee cancel the leave
 
 export const employeeLeaveUpdateModel = async (payload) => {
  try {
-  const { Leave_Request_Id } = payload;
+  const { Leave_Request_Id, employee_id } = payload;
 
-  const cancelLeaveStatusQuery = `UPDATE LeaveRequest SET status = 7 WHERE LR_id = ? AND (status = 0 OR status = 1);
-`;
-  await pool.query(cancelLeaveStatusQuery, [Leave_Request_Id]);
+  const cancelLeaveStatusQuery = `UPDATE LeaveRequest SET status = 7 WHERE id = ? AND (status = 0 OR status = 1)`;
 
+  const query = `INSERT INTO ApprovalFlow(leave_request_id, approved_id, approval_status, comments)VALUES(?, ?, 7, 'I Cancel the leave') `;
+  const values = [Leave_Request_Id, employee_id];
+ const result =  await pool.query(cancelLeaveStatusQuery, [Leave_Request_Id]);
+   await pool.query(query, values);
   return result;
  } catch (err) {
   console.error(err);

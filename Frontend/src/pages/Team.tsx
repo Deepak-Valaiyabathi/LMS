@@ -17,19 +17,18 @@ function Team() {
 
   const [peersDetails, setPeersDetails] = useState<Peer[]>([]);
 
-  const peersHandler = async (token:string, id:string) => {
+  const peersHandler = async (token:string, manager_id:string) => {
     try {
       
       const response = await fetch(
-        "http://localhost:5000/api/peers",
+        `http://localhost:5000/api/peers/${manager_id}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ id }),
-          credentials: "include",
+        
         }
       );
 
@@ -52,16 +51,16 @@ function Team() {
       return;
     }
  
-    let manager_id_to_send: string | null = null;
+    let manager_id: string | null = null;
     
-      manager_id_to_send = managerId;
+      manager_id = managerId;
    
-    if (!manager_id_to_send) {
+    if (!manager_id) {
       console.error("Missing manager_id to send to backend.");
       return;
     }
     
-    peersHandler(token, manager_id_to_send)
+    peersHandler(token, manager_id)
     
   },[])
     

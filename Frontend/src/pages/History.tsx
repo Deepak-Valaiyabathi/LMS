@@ -47,15 +47,14 @@ const styleCalender = {display: show === false ? "block":"none"}
     const leaveHistory = async (token:string, employee_id: string) => {
         try {
             const response = await fetch(
-              "http://localhost:5000/api/leaves-history",
+              `http://localhost:5000/api/leaves-history/${employee_id}`,
               {
-                method: "POST",
+                method: "GET",
                 headers: {
                   Authorization: `Bearer ${token}`,
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ employee_id }),
-                credentials: "include",
+               
               }
             );
             const result = await response.json();
@@ -156,7 +155,7 @@ const styleCalender = {display: show === false ? "block":"none"}
           </tr>
         </thead>
         <tbody>
-  {history.map((request, index)=>(
+  {history.sort((a, b) => b.leaveRequestId - a.leaveRequestId).map((request, index)=>(
   <tr key={index} className="hover:bg-gray-100 transition">
   <td className="text-[17px] font-normal px-3 py-2 h-[7vh]">
     {request.Employee_Id}

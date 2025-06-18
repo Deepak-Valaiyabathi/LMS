@@ -77,15 +77,14 @@ function TeamCalender() {
   const teamMembersLeaveDate = async (token: string, manager_id: string) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/team-members/leaves-dates",
+        `http://localhost:5000/api/team-members/leaves-dates/${manager_id}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ manager_id }),
-          credentials: "include",
+
         }
       );
 

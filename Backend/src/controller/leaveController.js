@@ -1,30 +1,33 @@
 //leave controller
-import { leavePolicyModel } from "../models/leaveModel.js";
+
 import {
+  leavePolicyModel,
   leaveTypeModel,
   teamMemberCalenderModel,
+  leaveRequestModel,
+  holidayModel,
+  leaveRequestStatusModel,
+  leaveRequestStatusTimelineModel,
+  managerLeaveUpdateModel,
+  hrLeaveUpdateModel,
+  directorLeaveUpdateModel,
+  teamMembersLeaveStatusModel,
+  employeeLeaveUpdateModel,
+  leaveRequestManagerModel,
+  leaveRequestHRModel,
+  leaveTypeShowModel,
+  leaveRequestDirectorModel,
+  leaveHistoryModel,
+  holidaysModel,
+  leaveDateHistoryModel,
+  employeeTypeModel,
+  leavePoliciesModel
 } from "../models/leaveModel.js";
-import { leaveRequestModel } from "../models/leaveModel.js";
-import { holidayModel } from "../models/leaveModel.js";
-import { leaveRequestStatusModel } from "../models/leaveModel.js";
-import { leaveRequestStatusTimelineModel } from "../models/leaveModel.js";
-import { managerLeaveUpdateModel } from "../models/leaveModel.js";
-import { hrLeaveUpdateModel } from "../models/leaveModel.js";
-import { directorLeaveUpdateModel } from "../models/leaveModel.js";
-import { teamMembersLeaveStatusModel } from "../models/leaveModel.js";
-import { employeeLeaveUpdateModel } from "../models/leaveModel.js";
-import { leaveRequestManagerModel } from "../models/leaveModel.js";
-import { leaveRequestHRModel } from "../models/leaveModel.js";
-import { leaveRequestDirectorModel } from "../models/leaveModel.js";
-import { leaveHistoryModel } from "../models/leaveModel.js";
-import { holidaysModel } from "../models/leaveModel.js";
-import { leaveDateHistoryModel } from "../models/leaveModel.js";
-import { employeeTypeModel } from "../models/leaveModel.js";
-import { leavePoliciesModel } from "../models/leaveModel.js";
-import { leaveTypeShowModel } from "../models/leaveModel.js";
-import Joi from "joi";
 
-//=======> POST 🚩 <=========
+
+import { leaveT, holidayV, leaveP, leaveR } from "../validation/leaveValidation.js";
+
+
 //******** Admin ********/
 
 // leave type create
@@ -32,20 +35,8 @@ export const leaveType = async (request, h) => {
   try {
     const { leaveName, description } = request.payload;
 
-    const schema = Joi.object({
-      leaveName: Joi.string().min(4).max(20).required().messages({
-        "string.min": "leave name must be at least 4 characters long",
-        "string.max": "leave name must not exceed 20 characters",
-        "any.required": "leave name is required",
-      }),
-      description: Joi.string().min(10).max(150).required().messages({
-        "string.min": "description must be at least 4 characters long",
-        "string.max": "description must not exceed 20 characters",
-        "any.required": "description is required",
-      }),
-    });
 
-    const { error } = schema.validate({
+    const { error } = leaveT.validate({
       leaveName,
       description,
     });
@@ -72,26 +63,9 @@ export const holiday = async (request, h) => {
   try {
     const { holidayDate, holidayName, type } = request.payload;
 
-    const schema = Joi.object({
-      holidayDate: Joi.date().less("now").required().messages({
-        "date.base": "Date of joining must be a valid date",
-        "date.less": "Date of joining must be in the past",
-        "any.required": "Date of joining is required",
-      }),
-      holidayName: Joi.string().min(4).max(20).required().messages({
-        "string.min": "holiday name must be at least 4 characters long",
-        "string.max": "holiday name must not exceed 20 characters",
-        "any.required": "holiday name is required",
-      }),
-      type: Joi.string()
-      .valid('Public', 'National', 'Floater', 'Other')
-      .required()
-      .messages({
-        'any.only': 'Leave Type must be one of Public, National, Floater, Other',
-        'any.required': 'Leave Type is required',
-      }),
-    });
-    const { error } = schema.validate({
+   
+
+    const { error } = holidayV.validate({
       holidayDate,
       holidayName,
       type,
@@ -117,31 +91,8 @@ export const leavePolicy = async (request, h) => {
   try {
     const {employee_type_id, leave_type_id, max_days_per_year, name, accrual_per_month} = request.payload;
 
-    const schema = Joi.object({
-      employee_type_id: Joi.number().Role_id().required().messages({
-        "any.required": "Role is required",
-        "number.empty": "Role cannot be empty",
-      }),
-      leave_type_id: Joi.number().Role_id().required().messages({
-        "any.required": "Role is required",
-        "number.empty": "Role cannot be empty",
-      }),
-      max_days_per_year: Joi.number().Role_id().required().messages({
-        "any.required": "Role is required",
-        "number.empty": "Role cannot be empty",
-      }),
-      name: Joi.string().min(10).max(400).required().messages({
-        "string.min": "Name must be at least 20 characters long",
-        "string.max": "Name must not exceed 400 characters",
-        "any.required": "Name is required",
-      }),
-      accrual_per_month: Joi.number().Role_id().required().messages({
-        "any.required": "Role is required",
-        "number.empty": "Role cannot be empty",
-      }),
-    })
-
-    const { error } = schema.validate({  employee_type_id, leave_type_id, max_days_per_year, name, accrual_per_month  });
+  
+    const { error } = leaveP.validate({  employee_type_id, leave_type_id, max_days_per_year, name, accrual_per_month  });
 
     if (error) {
       return h.response({ message: error.message }).code(400);
@@ -158,7 +109,7 @@ export const leavePolicy = async (request, h) => {
 };
 
 //******** Employee ********/
-//=======> POST 🚩 <=========
+
 
 //leave apply
 export const leaveRequest = async (request, h) => {
@@ -166,59 +117,7 @@ export const leaveRequest = async (request, h) => {
 
 const {employee_id, leaveId, startDate, endDate, reason} = request.payload.formData;
 
-const schema = Joi.object({
-  employee_id: Joi.string()
-    .pattern(/^LMT\d{5}$/)
-    .required()
-    .messages({
-      'string.pattern.base': 'Employee ID must start with "LMT" followed by 5 digits (e.g., LMT12345)',
-      'string.empty': 'Employee ID is required',
-      'any.required': 'Employee ID is required',
-    }),
-
-    leaveId: Joi.number()
-    .integer()
-    .positive()
-    .required()
-    .messages({
-      'number.base': 'Leave Type ID must be a number',
-      'number.integer': 'Leave Type ID must be an integer',
-      'number.positive': 'Leave Type ID must be a positive number',
-      'any.required': 'Leave Type ID is required',
-    }),
-
-    startDate: Joi.date()
-    .required()
-    .messages({
-      'date.base': 'Start Date must be a valid date',
-      'any.required': 'Start Date is required',
-    }),
-  
-    endDate: Joi.date()
-    .min(Joi.ref('startDate')) 
-    .required()
-    .messages({
-      'date.base': 'End Date must be a valid date',
-      'date.min': 'End Date must be same or after Start Date',
-      'any.required': 'End Date is required',
-    }),
-  
-  
-
-  reason: Joi.string()
-    .min(5)
-    .max(200)
-    .required()
-    .messages({
-      'string.base': 'Reason must be a string',
-      'string.empty': 'Reason is required',
-      'string.min': 'Reason must be at least 5 characters long',
-      'string.max': 'Reason must not exceed 200 characters',
-      'any.required': 'Reason is required',
-    }),
-});
-
-    const { error } = schema.validate({  employee_id, leaveId, startDate, endDate, reason  });
+    const { error } = leaveR.validate({  employee_id, leaveId, startDate, endDate, reason  });
 
     if (error) {
       return h.response({ message: error.message }).code(400);
@@ -242,7 +141,8 @@ const schema = Joi.object({
 
 export const leaveRequestStatus = async (request, h) => {
   try {
-    const result = await leaveRequestStatusModel(request.payload);
+    const employee_id = request.params.employee_id;
+    const result = await leaveRequestStatusModel(employee_id);
 
     if (result && Object.keys(result).length > 0) {
       const leaveStatus = result.map((row) => ({
@@ -270,7 +170,8 @@ export const leaveRequestStatus = async (request, h) => {
 
 export const leaveRequestStatusTimeline = async (request, h) => {
   try {
-    const result = await leaveRequestStatusTimelineModel(request.payload);
+    const request_id = request.params.request_id;
+    const result = await leaveRequestStatusTimelineModel(request_id);
 
     return h.response({ result }).code(200);
   } catch (err) {
@@ -278,19 +179,19 @@ export const leaveRequestStatusTimeline = async (request, h) => {
   }
 };
 
-//******** Employee see automatic data********/
-//+++++++++++++ Post ++++++++++
-//
+
+
 // team members leave status
 
 export const teamMembersLeaveStatus = async (request, h) => {
   try {
-    const result = await teamMembersLeaveStatusModel(request.payload);
+    const result = await teamMembersLeaveStatusModel(request.params);
 
     if (!result || result.length === 0) {
       return h.response({ message: "Not available" }).code(404);
     }
     const teamLeaveStatus = result.map((row) => ({
+      id: row.id,
       name: row.name,
       start_date: row.start_date,
       end_date: row.end_date,
@@ -309,7 +210,8 @@ export const teamMembersLeaveStatus = async (request, h) => {
 
 export const teamMemberCalender = async (request, h) => {
   try {
-    const result = await teamMemberCalenderModel(request.payload);
+    const manager_id = request.params.manager_id;
+    const result = await teamMemberCalenderModel(manager_id);
 
     if (!result || result.length === 0) {
       return h.response({ message: "Not available" }).code(404);
@@ -342,7 +244,8 @@ export const teamMemberCalender = async (request, h) => {
 // manager see the leave request
 export const leaveRequestManager = async (request, h) => {
   try {
-    const result = await leaveRequestManagerModel(request.payload);
+    const employee_id = request.params.employee_id;
+    const result = await leaveRequestManagerModel(employee_id);
     if (!result || result.length === 0) {
       return h.response({ message: "Not available" }).code(404);
     }
@@ -369,7 +272,9 @@ export const leaveRequestManager = async (request, h) => {
 
 export const leaveRequestHR = async (request, h) => {
   try {
-    const result = await leaveRequestHRModel(request.payload);
+    const employee_id = request.params.employee_id;
+
+    const result = await leaveRequestHRModel(employee_id);
     if (!result || result.length === 0) {
       return h.response({ message: "Not available" }).code(404);
     }
@@ -396,7 +301,8 @@ export const leaveRequestHR = async (request, h) => {
 // Director see the leave request
 export const leaveRequestDirector = async (request, h) => {
   try {
-    const result = await leaveRequestDirectorModel(request.payload);
+    const employee_id = request.params.employee_id;
+    const result = await leaveRequestDirectorModel(employee_id);
 
     if (!result || result === "empty" || result.length === 0) {
       return h.response({ message: "Not available" }).code(404);
@@ -428,7 +334,8 @@ export const leaveRequestDirector = async (request, h) => {
 
 export const leavesHistory = async (request, h) => {
   try {
-    const result = await leaveHistoryModel(request.payload);
+    const employee_id = request.params.employee_id;
+    const result = await leaveHistoryModel(employee_id);
     console.log("result", result);
 
     if (!result || result === "empty" || result.length === 0) {
@@ -454,9 +361,10 @@ export const leavesHistory = async (request, h) => {
 };
 
 export const leaveDateHistory = async (request, h) => {
-  console.log("history payload", request.payload);
+
   try {
-    const result = await leaveDateHistoryModel(request.payload);
+    const employee_id = request.params.employee_id;
+    const result = await leaveDateHistoryModel(employee_id);
     console.log("leave dates: ", result);
 
     return h.response({ data: result }).code(200);
@@ -466,7 +374,7 @@ export const leaveDateHistory = async (request, h) => {
   }
 };
 
-//=======> PUT 🆙 <=========
+
 // employee cancel the leave
 
 export const employeeLeaveUpdate = async (request, h) => {
@@ -543,7 +451,7 @@ export const directorLeaveUpdate = async (request, h) => {
   }
 };
 
-//==========GET==============
+
 // all user see the holidays
 
 export const holidays = async (request, h) => {

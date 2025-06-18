@@ -1,6 +1,6 @@
 
 import LandingPage from "../components/LandingPage"
-import LoginPage from "../components/LoginPage";
+import LoginPage from "../pages/LoginPage";
 import ProtectedRoute from "./ProtectedRoute";
 import HomePageProductedRoute from "./HomePageProductedRoute";
 import LeaveRequestProductedRoute from "./LeaveRequestProductedRoute";

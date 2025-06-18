@@ -1,196 +1,209 @@
+import {
+  leavePolicy,
+  leaveType,
+  leaveRequest,
+  holiday,
+  employeeLeaveUpdate,
+  managerLeaveUpdate,
+  hrLeaveUpdate,
+  directorLeaveUpdate,
+  leaveRequestStatus,
+  leaveRequestStatusTimeline,
+  teamMembersLeaveStatus,
+  leaveRequestManager,
+  leaveRequestHR,
+  leaveRequestDirector,
+  leavesHistory,
+  holidays,
+  leaveDateHistory,
+  employeeType,
+  leavePolicies,
+  teamMemberCalender,
+  leaveTypeShow
+} from "../controller/leaveController.js";
 
-import { leavePolicy } from "../controller/leaveController.js";
-import {leaveType} from "../controller/leaveController.js";
-import {leaveRequest} from "../controller/leaveController.js";
-import { holiday } from "../controller/leaveController.js";
-import {getHolidayList} from "../utility/leaveCount.js";
-import {employeeLeaveUpdate} from "../controller/leaveController.js";
-import { managerLeaveUpdate } from "../controller/leaveController.js";
-import { hrLeaveUpdate } from "../controller/leaveController.js";
-import { directorLeaveUpdate } from "../controller/leaveController.js";
-import { leaveRequestStatus } from "../controller/leaveController.js";
-import { leaveRequestStatusTimeline } from "../controller/leaveController.js";
-import { teamMembersLeaveStatus } from "../controller/leaveController.js";
-import { leaveRequestManager } from "../controller/leaveController.js";
-import { leaveRequestHR } from "../controller/leaveController.js";
-import { leaveRequestDirector } from "../controller/leaveController.js";
-import { leavesHistory } from "../controller/leaveController.js";
-import { holidays } from "../controller/leaveController.js";
-import { leaveDateHistory } from "../controller/leaveController.js";
-import { employeeType } from "../controller/leaveController.js";
-import { leavePolicies } from "../controller/leaveController.js";
-import { teamMemberCalender } from "../controller/leaveController.js";
-import { leaveTypeShow } from "../controller/leaveController.js";
+import { getHolidayList } from "../utility/leaveCount.js";
+
+
 
 export const leaveRoute = [
-  
- //=======> POST 🚩 <=========
-   //******** Admin ********/
+  //=======> POST 🚩 <=========
 
- // leave type create
-      {
-        method:"POST",
-        path: "/api/leave-type",
-        handler:leaveType,
-      },
-      //holiday create
-      {
-        method: "POST",
-        path: "/api/holiday",
-        handler:holiday,
-      },
-      // leave policy
-      {
-        method:"POST",
-        path:"/api/leave-policy",
-        handler:leavePolicy,
-      },
-      //=================> GET <===================
-        {
-          method: "get",
-          path: "/api/get-holiday",
-          handler:getHolidayList,
-        },
-  
-   //******** Employee ********/
-   //=======> POST 🚩 <=========
+  //******** Admin ********/
 
-//leave apply
-     {
-      method:"POST",
-      path:"/api/leave-request",
-      handler:leaveRequest,
-     },
- 
-     // user see the leave request status
-
-     {
-      method:"POST",
-      path:"/api/leave-request-status",
-      handler:leaveRequestStatus,
-     },
-
-     //user see the leave request status approved timeline
- {
-  method:"POST",
-  path:"/api/leave-request-status-timeline",
-  handler:leaveRequestStatusTimeline,
- },
-       //******** Employee see automatic data********/
-  //+++++++++++++ Post ++++++++++f
-  //
-  // team members leave status
+  // leave type create
   {
-    method:"POST",
-    path:"/api/team-members/leave-status",
-    handler:teamMembersLeaveStatus,
-   },
-
-
-   //team members leave dates
-   {
     method: "POST",
-    path: "/api/team-members/leaves-dates",
-    handler:teamMemberCalender,
-   },
-     // manager see the leave request 
-      {
-       method:"POST",
-       path:"/api/leave-request/manager",
-       handler:leaveRequestManager,
-      },
+    path: "/api/leave-type",
+    handler: leaveType,
+  },
+  //holiday create
+  {
+    method: "POST",
+    path: "/api/holiday",
+    handler: holiday,
+  },
+  // leave policy create
+  {
+    method: "POST",
+    path: "/api/leave-policy",
+    handler: leavePolicy,
+  },
 
-      // hr see the leave request
+  //******** Employee ********/
 
-      {
-        method:"POST",
-        path:"/api/leave-request/HR",
-        handler:leaveRequestHR,
-      },
+  //leave apply
+  {
+    method: "POST",
+    path: "/api/leave-request",
+    handler: leaveRequest,
+  },
 
-      // Director see the leave request
+ 
+  //=======> GET  <=========
 
-      {
-        method: "POST",
-        path:"/api/leave-request/Director",
-        handler:leaveRequestDirector,
-      },
+  //******** Admin ********/
 
-      // Manger see the leaves history
-
-      {
-        method: "POST",
-        path:"/api/leaves-history",
-        handler:leavesHistory,
-      },
-
-      {
-        method: "POST",
-        path: "/api/leave-date-history",
-        handler:leaveDateHistory,
-      },
-
-    
-      //=======> PUT 🆙 <=========
-      // employee cancel the leave
-     {
-      method:"PUT",
-      path:"/api/leave-request/employee-update",
-      handler:employeeLeaveUpdate,
-     },
-
-     // manager accepet or cancel the leave
-
-     {
-      method:"PUT",
-      path:"/api/leave-request/manager-update",
-      handler:managerLeaveUpdate,
-     },
-
-     // HR accept or cancel the leave
-
-     {
-      method:"PUT",
-      path:"/api/leave-request/hr-update",
-      handler:hrLeaveUpdate,
-     },
-
-     //Director accept or cancel the leave
-
-     {
-      method:"PUT",
-      path:"/api/leave-request/director-update",
-      handler:directorLeaveUpdate,
-     },
-   //==========GET==============
-  // all user see the holidays
   {
     method: "GET",
-    path:"/api/holidaysShow",
-    handler:holidays
+    path: "/api/get-holiday",
+    handler: getHolidayList,
   },
+
 
   // employee type show
   {
-    method:"GET",
-    path:"/api/employee-types",
-    handler:employeeType
+    method: "GET",
+    path: "/api/employee-types",
+    handler: employeeType,
   },
 
   // leave policy show
   {
-    method:"GET",
-    path:"/api/leave-policies",
-    handler:leavePolicies
+    method: "GET",
+    path: "/api/leave-policies",
+    handler: leavePolicies,
   },
 
   // leave type show
   {
-    method:"GET",
-    path:"/api/leave-type-show",
-    handler:leaveTypeShow
-  }
+    method: "GET",
+    path: "/api/leave-type-show",
+    handler: leaveTypeShow,
+  },
+
+  // ============ Employee ===========
+
+    // user see the leave request status
+
+    {
+      method: "GET",
+      path: "/api/leave-request-status/{employee_id}",
+      handler: leaveRequestStatus,
+    },
+
+      // empoyee holiday show
+  {
+    method: "GET",
+    path: "/api/holidaysShow",
+    handler: holidays,
+  },
+
+  // team members leave status
+  {
+    method: "GET",
+    path: "/api/team-leave-request-status/{manager_id}/{employee_id}",
+    handler: teamMembersLeaveStatus,
+  },
+
+  //team members leave dates
+  {
+    method: "GET",
+    path: "/api/team-members/leaves-dates/{manager_id}",
+    handler: teamMemberCalender,
+  },
+
+  //user see the leave request status approved timeline
+
+  {
+    method: "GET",
+    path: `/api/leave-request-status-timeline/{request_id}`,
+    handler: leaveRequestStatusTimeline,
+  },
+
+   // manager see the leave request
+
+   {
+    method: "GET",
+    path: "/api/leave-request/manager/{employee_id}",
+    handler: leaveRequestManager,
+  },
+
+  
+  // hr see the leave request
+
+  {
+    method: "GET",
+    path: "/api/leave-request/HR/{employee_id}",
+    handler: leaveRequestHR,
+  },
+
+  // Director see the leave request
+
+  {
+    method: "GET",
+    path: "/api/leave-request/Director/{employee_id}",
+    handler: leaveRequestDirector,
+  },
+
+  // Manger and HR and Director see the leaves history
+
+  {
+    method: "GET",
+    path: "/api/leaves-history/{employee_id}",
+    handler: leavesHistory,
+  },
+
+
+  // all user leave request dates
+  {
+    method: "GET",
+    path: "/api/leave-date-history/{employee_id}",
+    handler: leaveDateHistory,
+  },
+
+
+  // ==========> PUT <=========
+
+  // ************ employee **************/
+
+  {
+    method: "PUT",
+    path: "/api/leave-request/employee-update",
+    handler: employeeLeaveUpdate,
+  },
+
+  // manager accepet or cancel the leave
+
+  {
+    method: "PUT",
+    path: "/api/leave-request/manager-update",
+    handler: managerLeaveUpdate,
+  },
+
+  // HR accept or cancel the leave
+
+  {
+    method: "PUT",
+    path: "/api/leave-request/hr-update",
+    handler: hrLeaveUpdate,
+  },
+
+  //Director accept or cancel the leave
+
+  {
+    method: "PUT",
+    path: "/api/leave-request/director-update",
+    handler: directorLeaveUpdate,
+  },
 ];
-
-
- 

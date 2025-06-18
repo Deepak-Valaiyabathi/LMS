@@ -16,6 +16,8 @@ interface EmployeeDetails {
   manager_id: string;
   hr_id: string;
   director_id: string;
+  status:string;
+  edit:boolean;
 }
 
 interface EmployeeaddEmployee {
@@ -90,7 +92,8 @@ function Admin() {
   const eTStyle = { display: eTForm === true ? "block" : "none" };
 
  
-  
+
+
   // employee roles and count
   const employeeCount = async (token: string) => {
     try {
@@ -140,11 +143,96 @@ function Admin() {
 
       const result = await response.json();
 
-      setEmployeeDetails(result);
+      const updatedResult = result.map((emp: EmployeeDetails) => ({
+        ...emp,
+        edit: false,
+      }));
+      
+      setEmployeeDetails(updatedResult);
+      
     } catch (err) {
       console.error("Error fetching employee count:", err);
     }
   };
+
+    // employee account deactivated
+
+    const employeeDeactivate = async (employee_id:string) => {
+
+      const confirmed = window.confirm("Are you sure you want to deactivate the account?");
+      if(confirmed){
+  
+        try {
+          const response = await fetch(
+            "http://localhost:5000/api/employeeDeactivate",
+            {
+              method: "PUT",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({employee_id}),
+              credentials: "include",
+            }
+          );
+    
+          const result = await response.json();
+          if(result.message === "Account deactivated"){
+            alert(result.message); 
+            window.location.reload();
+          }else{
+            alert(result.message);
+          }
+          
+        } catch (err) {
+          console.error("Employee creation failed", err);
+        }
+        
+      }
+   
+    }
+  
+    /// employee edit
+  
+    const employeeEdit = (id: string) => {
+      setEmployeeDetails(prev =>
+        prev.map(emp =>
+          emp.employee_id === id ? { ...emp, edit: !emp.edit } : emp
+        )
+      );
+    };
+
+    const [employeeEditChange, setEmployeeEditChange] =  useState<{ [key: string]: string }>({})
+    
+   const employeeChange = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/employeeEdit",
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({employeeEditChange:employeeEditChange}),
+          credentials: "include",
+        }
+      );
+
+      const result = await response.json();
+      console.log(result)
+      if(result.message === "All accounts updated successfully"){
+        alert(result.message); 
+        setEmployeeEditChange({});
+        window.location.reload();
+      }else{
+        alert(result.message);
+      }
+      
+    } catch (err) {
+      console.error("Employee creation failed", err);
+    }
+   }
   //date format converter
   const formatDate = (isoDate: string): string => {
     const date = new Date(isoDate);
@@ -209,6 +297,8 @@ function Admin() {
       console.error("Employee creation failed", err);
     }
   };
+
+
 
   //   // add job details
 
@@ -760,7 +850,7 @@ function Admin() {
                     <th className="text-[17px] font-normal w-20 h-10 border">
                       Joining Date
                     </th>
-                    <th className="text-[17px] font-normal w-25 h-10 border">
+                    <th className="text-[17px] font-normal w-50 h-10 border">
                       Manager Id
                     </th>
                     <th className="text-[17px] font-normal w-25 h-10 border">
@@ -768,6 +858,9 @@ function Admin() {
                     </th>
                     <th className="text-[17px] font-normal w-25 h-10 border">
                       Director Id
+                    </th>
+                    <th className="text-[17px] font-normal w-25 h-10 border">
+                     Action
                     </th>
                   </tr>
                 </thead>
@@ -792,15 +885,46 @@ function Admin() {
                         <td className="text-[17px] font-normal px-3 py-2 h-[7vh]">
                           {formatDate(request.date_of_joining)}
                         </td>
+
+                        {
+                          request.edit == true ? (
+                            <td className="flex gap-2 justify-center px-2 items-center">
+                            <input 
+                            type="text" 
+                            placeholder="Manager ID"
+                            className="w-45 px-4 py-2 mt-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            onChange={(e) => {
+                              setEmployeeEditChange((prev) => ({
+                                ...prev,
+                                [request.employee_id]: e.target.value, 
+                              }));
+                            }}
+                          />
+
+                          <button className="bg-blue-500 text-white h-7 rounded-lg w-15 cursor-pointer items-center" onClick={employeeChange}>Edit</button>
+                            </td>
+                        ):(
                         <td className="text-[17px] font-normal px-3 py-2 h-[7vh]">
-                          {request.manager_id}
-                        </td>
+                            {request.manager_id}
+                          </td>)
+                        }
+                        
                         <td className="text-[17px] font-normal px-3 py-2 h-[7vh]">
                           {request.hr_id}
                         </td>
                         <td className="text-[17px] font-normal px-3 py-2 h-[7vh]">
                           {request.director_id}
                         </td>
+                    {request.status === 'Deactive' ? (
+                         <td className="text-[17px] font-normal text-red-500 px-3 py-2 h-[7vh]">
+                          Deactivated
+                         </td> 
+                    ):(
+                      <td className="text-[17px] font-normal px-3 py-2 h-[7vh] flex justify-center gap-5">
+                          <i className="fa-regular fa-pen-to-square text-blue-800 cursor-pointer" onClick={() => employeeEdit(request.employee_id)}></i>
+                          <i className="fa-solid fa-trash-can text-red-400 cursor-pointer" onClick={()=>employeeDeactivate(request.employee_id)}></i>
+                          </td>
+                    )}
                       </tr>
                     ))}
                 </tbody>
